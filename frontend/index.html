@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FreeAI Studio — KI mit kostenlosen Modellen</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css" />
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🤖</div>
+      <h1>FreeAI <span>Studio</span></h1>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-item active" data-view="chat"><span class="ico">💬</span> Chatbot</div>
+      <div class="nav-item" data-view="image"><span class="ico">🖼️</span> Bildgenerierung</div>
+      <div class="nav-item" data-view="text"><span class="ico">📝</span> Text-Tools</div>
+      <div class="nav-item" data-view="speech"><span class="ico">🎤</span> Sprache → Text</div>
+      <div class="nav-item" data-view="tts"><span class="ico">🔊</span> Text → Sprache</div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="settings-btn" id="openSettings">⚙️ Einstellungen & Status</button>
+      <button class="theme-toggle" id="themeToggle">🌙 Design wechseln</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="topbar">
+      <div class="title">
+        <button class="hamburger" id="hamburger">☰</button>
+        <span id="viewTitle">💬 Chatbot</span>
+      </div>
+      <div class="model-picker" id="modelPickerWrap">
+        <select id="chatModel"></select>
+      </div>
+    </header>
+
+    <!-- CHAT VIEW -->
+    <section class="view active chat-view" id="view-chat">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-empty" id="chatEmpty">
+          <div>
+            <div class="big">💬</div>
+            <h2>Willkommen im FreeAI Studio</h2>
+            <p>Stelle eine Frage und chatte mit kostenlosen KI-Modellen.</p>
+          </div>
+        </div>
+      </div>
+      <div class="composer">
+        <div class="composer-inner">
+          <textarea id="chatInput" rows="1" placeholder="Schreibe eine Nachricht… (Enter zum Senden)"></textarea>
+          <button class="send-btn" id="chatSend">➤</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMAGE VIEW -->
+    <section class="view" id="view-image">
+      <div class="banner" id="imageBanner"></div>
+      <div class="tool-card">
+        <h2>🖼️ Bildgenerierung</h2>
+        <p class="desc">Erzeuge Bilder aus Text mit kostenlosen Modellen (Hugging Face — FLUX / Stable Diffusion).</p>
+        <label class="field-label">Modell</label>
+        <select class="input" id="imageModel"></select>
+        <label class="field-label">Bildbeschreibung (Prompt)</label>
+        <textarea class="input" id="imagePrompt" placeholder="z.B. Ein futuristischer Roboter in einer neonbeleuchteten Stadt bei Nacht, digitale Kunst"></textarea>
+        <button class="btn-primary" id="imageBtn"><span>✨ Bild erzeugen</span></button>
+        <img class="result-img" id="imageResult" style="display:none" alt="Ergebnis" />
+      </div>
+    </section>
+
+    <!-- TEXT TOOLS VIEW -->
+    <section class="view" id="view-text">
+      <div class="banner" id="textBanner"></div>
+      <div class="tool-card">
+        <h2>📝 Text-Tools</h2>
+        <p class="desc">Fasse lange Texte zusammen oder übersetze sie in jede Sprache.</p>
+        <div class="seg" id="textMode">
+          <button class="active" data-mode="summary">Zusammenfassen</button>
+          <button data-mode="translate">Übersetzen</button>
+        </div>
+        <div class="row">
+          <div>
+            <label class="field-label">Modell</label>
+            <select class="input" id="textModel"></select>
+          </div>
+          <div id="langWrap" style="display:none">
+            <label class="field-label">Zielsprache</label>
+            <input class="input" id="targetLang" value="Englisch" />
+          </div>
+        </div>
+        <label class="field-label">Dein Text</label>
+        <textarea class="input" id="textInput" placeholder="Füge hier den Text ein…"></textarea>
+        <button class="btn-primary" id="textBtn"><span>⚡ Ausführen</span></button>
+        <div class="result-box" id="textResult"></div>
+      </div>
+    </section>
+
+    <!-- SPEECH VIEW -->
+    <section class="view" id="view-speech">
+      <div class="banner" id="speechBanner"></div>
+      <div class="tool-card">
+        <h2>🎤 Sprache → Text</h2>
+        <p class="desc">Nimm deine Stimme auf und lasse sie transkribieren (Whisper über Groq).</p>
+        <div class="recorder">
+          <button class="rec-btn" id="recBtn">🎙️</button>
+          <span class="rec-status" id="recStatus">Klicke zum Aufnehmen</span>
+        </div>
+        <div class="result-box" id="speechResult"></div>
+      </div>
+    </section>
+
+    <!-- TTS VIEW -->
+    <section class="view" id="view-tts">
+      <div class="tool-card">
+        <h2>🔊 Text → Sprache</h2>
+        <p class="desc">Lasse dir Text vorlesen (nutzt die eingebaute Sprachausgabe deines Browsers — komplett kostenlos & offline).</p>
+        <label class="field-label">Stimme</label>
+        <select class="input" id="ttsVoice"></select>
+        <label class="field-label">Text</label>
+        <textarea class="input" id="ttsInput" placeholder="Gib den Text ein, der vorgelesen werden soll…"></textarea>
+        <button class="btn-primary" id="ttsBtn"><span>🔊 Vorlesen</span></button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <h2>⚙️ Einstellungen & Anbieter-Status</h2>
+      <p>Die App nutzt kostenlose KI-Anbieter. Trage deine API-Schlüssel in der Datei <code>backend/.env</code> ein und starte den Server neu. Alle Schlüssel sind kostenlos erhältlich:</p>
+      <div class="status-list" id="statusList"></div>
+      <p style="margin-top:14px">
+        🔑 Kostenlose Keys holen:<br>
+        • <a href="https://console.groq.com/keys" target="_blank">Groq</a> &nbsp;
+        • <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a> &nbsp;
+        • <a href="https://aistudio.google.com/app/apikey" target="_blank">Google Gemini</a> &nbsp;
+        • <a href="https://huggingface.co/settings/tokens" target="_blank">Hugging Face</a>
+      </p>
+      <button class="close" id="closeSettings">Schließen</button>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
